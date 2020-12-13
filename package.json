@@ -8,7 +8,7 @@
     "start": "ts-node ./src/index.ts",
     "start:prod": "export NODE_ENV=production && nodemon",
     "start:dev": "nodemon",
-    "build": "rimraf ./build && tsc",
+    "build": "tsc",
     "clean": "rimraf ./build"
   },
   "keywords": [],
