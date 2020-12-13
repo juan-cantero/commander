@@ -1,19 +1,9 @@
 import { Container } from 'typedi';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const serverConfig = (): void => {
-  if (process.env.PORT) {
-    Container.set('port', process.env.PORT);
-    return;
-  }
-
-  let port: number;
-  if (process.env.NODE_ENV == 'production') {
-    port = 6000;
-  } else {
-    port = 5000;
-  }
-
-  Container.set('port', port);
+  Container.set('port', process.env.PORT);
 };
 
 export default serverConfig;
