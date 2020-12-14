@@ -1,6 +1,7 @@
 import { Inject, Service } from 'typedi';
 import CommandService from './CommandService';
 import { Request, Response, NextFunction } from 'express';
+import passErrorToHandler from '../services/handleError';
 
 @Service()
 class CommandController {
@@ -12,7 +13,7 @@ class CommandController {
       const commands = await this.commandService.getAllCommands();
       res.status(200).json(commands);
     } catch (error) {
-      throw error;
+      passErrorToHandler(error, next);
     }
   }
 }
