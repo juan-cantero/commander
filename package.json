@@ -8,7 +8,7 @@
     "postinstall": "tsc",
     "start:prod": "export NODE_ENV=production && nodemon",
     "start:dev": "nodemon",
-    "build": "tsc",
+    "build": "tsc -p tsconfig-build.json",
     "clean": "rimraf ./build",
     "test": "jest"
   },

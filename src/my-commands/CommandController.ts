@@ -8,10 +8,17 @@ class CommandController {
   @Inject()
   private commandService!: CommandService;
 
-  async getAllCommands(req: Request, res: Response, next: NextFunction) {
+  //@describe get all the commands
+  //@route GET /api/commands
+  //@access PRIVATE
+  async getAllCommands(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
     try {
       const commands = await this.commandService.getAllCommands();
-      res.status(200).json(commands);
+      return res.status(200).json(commands);
     } catch (error) {
       passErrorToHandler(error, next);
     }
