@@ -1,9 +1,10 @@
+import { Document } from 'mongoose';
 import { Service } from 'typedi';
-import Platform from './PlatformModel';
+import Platform, { IPlatform } from './PlatformModel';
 
 @Service()
 class PlatformService {
-  async findPlatformById(id: string) {
+  async findPlatformById(id: string): Promise<IPlatform | null> {
     try {
       const platform = await Platform.findById(id);
       return platform;
@@ -12,7 +13,7 @@ class PlatformService {
     }
   }
 
-  async findPlatformByName(name: string) {
+  async findPlatformByName(name: string): Promise<IPlatform | null> {
     try {
       const platform = await Platform.findOne({ platform: name }).exec();
       return platform;
@@ -21,8 +22,10 @@ class PlatformService {
     }
   }
 
-  async createPlatform(name: string) {
+  async findOrCreatePlatform(name: string): Promise<IPlatform> {
     try {
+      const dbPlatform = await this.findPlatformByName(name);
+      if (dbPlatform) return dbPlatform;
       const platform = new Platform({ platform: name });
       await Platform.create(platform);
       return platform._id;

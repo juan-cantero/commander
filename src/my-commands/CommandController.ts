@@ -17,14 +17,10 @@ class CommandController {
   //@describe get all the commands
   //@route GET /api/commands
   //@access PRIVATE
-  async getAllCommands(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<Response | void> {
+  async getAllCommands(req: Request, res: Response, next: NextFunction) {
     try {
       const commands = await this.commandService.getAllCommands();
-      return res.status(200).json(commands);
+      return res.status(200).json({ ok: true, commands: commands });
     } catch (error) {
       ErrorHandler.passErrorToHandler(error, next);
     }
@@ -35,38 +31,32 @@ class CommandController {
   //@access PRIVATE
   async createCommand(req: Request, res: Response, next: NextFunction) {
     const { user, command, description, platform } = req.body;
-    const commandDto = new CommandInputDto();
-    commandDto.user = user;
-    commandDto.command = command;
-    commandDto.description = description;
-    commandDto.platform = platform;
+    const commandInput = new CommandInputDto();
+    commandInput.user = user;
+    commandInput.command = command;
+    commandInput.description = description;
+    commandInput.platform = platform;
 
     try {
-      await validateOrReject(commandDto);
+      await validateOrReject(commandInput);
     } catch (error) {
       return ErrorHandler.handleValidationError(error, res);
     }
 
     try {
-      let createdPlatform;
-      let dbPlatform = await this.platformService.findPlatformByName(
-        commandDto.platform
+      const dbPlatform = await this.platformService.findOrCreatePlatform(
+        commandInput.platform
       );
-      if (!dbPlatform) {
-        createdPlatform = await this.platformService.createPlatform(
-          commandDto.platform
-        );
-      }
       const commandData = new CommandCreateDto();
-      commandData.user = commandDto.user;
-      commandData.command = commandDto.command;
-      commandData.description = commandDto.description;
-      commandData.platform =
-        dbPlatform !== null ? dbPlatform._id : createdPlatform._id;
+      commandData.user = commandInput.user;
+      commandData.command = commandInput.command;
+      commandData.description = commandInput.description;
+      commandData.platform = dbPlatform._id;
+
       const createdCommand = await this.commandService.createCommand(
         commandData
       );
-      res.json(createdCommand);
+      res.status(201).json({ ok: true, createdCommand: createdCommand });
     } catch (error) {
       ErrorHandler.passErrorToHandler(error, next);
     }

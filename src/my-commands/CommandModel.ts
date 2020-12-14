@@ -1,5 +1,12 @@
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
+
+export declare interface ICommand extends Document {
+  user: mongoose.Schema.Types.ObjectId;
+  command: String;
+  description: String;
+  platform: mongoose.Schema.Types.ObjectId;
+}
 
 const CommandSchema = new mongoose.Schema(
   {
@@ -30,6 +37,6 @@ const CommandSchema = new mongoose.Schema(
 
 CommandSchema.plugin(uniqueValidator);
 
-const Command = mongoose.model('Command', CommandSchema);
+const Command = mongoose.model<ICommand>('Command', CommandSchema);
 
 export default Command;

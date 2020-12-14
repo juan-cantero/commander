@@ -1,5 +1,9 @@
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
+
+export declare interface IPlatform extends Document {
+  platform: String;
+}
 
 const PlatformSchema = new mongoose.Schema(
   {
@@ -14,6 +18,6 @@ const PlatformSchema = new mongoose.Schema(
 
 PlatformSchema.plugin(uniqueValidator);
 
-const Platform = mongoose.model('Platform', PlatformSchema);
+const Platform = mongoose.model<IPlatform>('Platform', PlatformSchema);
 
 export default Platform;
