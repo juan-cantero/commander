@@ -6,7 +6,7 @@ class ErrorNext extends Error {
 }
 
 @Service()
-class ErrorHandler {
+class ErrorHandlerMiddleware {
   handleNotFound(req: Request, res: Response, next: NextFunction): void {
     const error = new Error(`Route not found ${req.originalUrl}`);
     res.status(404);
@@ -24,4 +24,4 @@ class ErrorHandler {
   }
 }
 
-export default ErrorHandler;
+export default ErrorHandlerMiddleware;

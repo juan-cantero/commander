@@ -9,4 +9,8 @@ commandsRoutes.get('/', (req: Request, res: Response, next: NextFunction) => {
   commandController.getAllCommands(req, res, next);
 });
 
+commandsRoutes.post('/', (req: Request, res: Response, next: NextFunction) => {
+  commandController.createCommand(req, res, next);
+});
+
 export default commandsRoutes;

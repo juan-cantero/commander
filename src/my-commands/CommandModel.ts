@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import uniqueValidator from 'mongoose-unique-validator';
 
 const CommandSchema = new mongoose.Schema(
   {
@@ -16,6 +17,7 @@ const CommandSchema = new mongoose.Schema(
     command: {
       type: String,
       required: true,
+      unique: true,
     },
 
     platform: {
@@ -25,6 +27,8 @@ const CommandSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+CommandSchema.plugin(uniqueValidator);
 
 const Command = mongoose.model('Command', CommandSchema);
 

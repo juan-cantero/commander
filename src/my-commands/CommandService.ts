@@ -1,7 +1,6 @@
 import Command from './CommandModel';
-import { Document } from 'mongoose';
 import { Service } from 'typedi';
-import CommandDto from './dto/command.dto';
+import CommandCreateDto from './dto/command.create.dto';
 
 @Service()
 class CommandService {
@@ -14,7 +13,7 @@ class CommandService {
     }
   }
 
-  async createCommand(commandData: CommandDto): Promise<any> {
+  async createCommand(commandData: CommandCreateDto): Promise<any> {
     const newCommand = new Command(commandData);
     try {
       return await newCommand.save();

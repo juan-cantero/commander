@@ -1,6 +1,6 @@
 import express from 'express';
 import { Inject, Service } from 'typedi';
-import ErrorHandler from './middlewares/ErrorHandler';
+import ErrorHandlerMiddleware from './middlewares/ErrorHandler';
 import routes from './routes';
 import Logger from './services/Logger';
 
@@ -8,7 +8,7 @@ import Logger from './services/Logger';
 class ExpressServer {
   private _app: express.Application = express();
   @Inject()
-  private _errorHandler!: ErrorHandler;
+  private _errorHandler!: ErrorHandlerMiddleware;
   @Inject('port')
   private _port!: number;
   @Inject()
