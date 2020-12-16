@@ -2,10 +2,10 @@ import mongoose, { Document } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
 
 export declare interface ICommand extends Document {
-  user: mongoose.Schema.Types.ObjectId;
+  user: mongoose.Schema.Types.ObjectId | string;
   command: String;
   description: String;
-  platform: mongoose.Schema.Types.ObjectId;
+  platform: mongoose.Schema.Types.ObjectId | string;
 }
 
 const CommandSchema = new mongoose.Schema(
@@ -24,7 +24,6 @@ const CommandSchema = new mongoose.Schema(
     command: {
       type: String,
       required: true,
-      unique: true,
     },
 
     platform: {
@@ -32,8 +31,14 @@ const CommandSchema = new mongoose.Schema(
       ref: 'Platform',
     },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true } }
 );
+
+CommandSchema.virtual('platformNames', {
+  ref: 'Platform',
+  localField: 'platform',
+  foreignField: 'platform',
+});
 
 CommandSchema.plugin(uniqueValidator);
 

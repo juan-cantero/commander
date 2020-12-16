@@ -1,5 +1,5 @@
 import { Inject, Service } from 'typedi';
-import CommandService from './CommandService';
+import CommandService from './commands.service';
 import { Request, Response, NextFunction } from 'express';
 import { validateOrReject } from 'class-validator';
 import ErrorHandler from '../services/ErrorHandler';
@@ -21,6 +21,40 @@ class CommandController {
     try {
       const commands = await this.commandService.getAllCommands();
       return res.status(200).json({ ok: true, commands: commands });
+    } catch (error) {
+      ErrorHandler.passErrorToHandler(error, next);
+    }
+  }
+
+  //@describe get all the commands that match description
+  //@route GET /api/commands/search/description/:description?platfrom
+  //@access PRIVATE
+  async getCommandsByDescription(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const description = req.params.description;
+      const platform: string = req.query.platform as string;
+      const commands = await this.commandService.getCommandsByDescription(
+        description,
+        platform
+      );
+      res.status(200).json({ ok: true, commands });
+    } catch (error) {
+      ErrorHandler.passErrorToHandler(error, next);
+    }
+  }
+
+  //@describe get all the commands that match platform
+  //@route GET /api/commands/search/platform/:platform
+  //@access PRIVATE
+  async getCommandsByPlatform(req: Request, res: Response, next: NextFunction) {
+    try {
+      const keyword = req.params.platform as string;
+      const commands = await this.commandService.getCommandByPlatform(keyword);
+      res.status(200).json({ ok: true, commands });
     } catch (error) {
       ErrorHandler.passErrorToHandler(error, next);
     }
@@ -57,6 +91,19 @@ class CommandController {
         commandData
       );
       res.status(201).json({ ok: true, createdCommand: createdCommand });
+    } catch (error) {
+      ErrorHandler.passErrorToHandler(error, next);
+    }
+  }
+
+  //@describe create command
+  //@route Delete /api/commands/:commandId
+  //@access PRIVATE
+  async deleteCommand(req: Request, res: Response, next: NextFunction) {
+    const { commandId } = req.params;
+    try {
+      await this.commandService.deleteCommand(commandId);
+      res.status(200).json({ ok: true, message: 'command deleted' });
     } catch (error) {
       ErrorHandler.passErrorToHandler(error, next);
     }

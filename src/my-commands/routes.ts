@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import Container from 'typedi';
-import CommandController from './CommandController';
+import CommandController from './commands.controller';
 
 const commandsRoutes: express.IRouter = express.Router();
 const commandController = Container.get(CommandController);
@@ -9,8 +9,29 @@ commandsRoutes.get('/', (req: Request, res: Response, next: NextFunction) => {
   commandController.getAllCommands(req, res, next);
 });
 
+commandsRoutes.get(
+  '/search/description/:description',
+  (req: Request, res: Response, next: NextFunction) => {
+    commandController.getCommandsByDescription(req, res, next);
+  }
+);
+
+commandsRoutes.get(
+  '/search/platform/:platform',
+  (req: Request, res: Response, next: NextFunction) => {
+    commandController.getCommandsByPlatform(req, res, next);
+  }
+);
+
 commandsRoutes.post('/', (req: Request, res: Response, next: NextFunction) => {
   commandController.createCommand(req, res, next);
 });
+
+commandsRoutes.delete(
+  '/:commandId',
+  (req: Request, res: Response, next: NextFunction) => {
+    commandController.deleteCommand(req, res, next);
+  }
+);
 
 export default commandsRoutes;
