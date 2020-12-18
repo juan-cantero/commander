@@ -12,10 +12,9 @@ class CommandService {
 
   async getAllCommands(): Promise<CommandOutputDto[]> {
     try {
-      const commands = await Command.find({}).populate(
-        'platform',
-        'platform -_id'
-      );
+      const commands = await Command.find({})
+        //.populate({ path: 'user', select: 'user -_id' })
+        .populate('platform', 'platform -_id');
 
       return commands;
     } catch (error) {
