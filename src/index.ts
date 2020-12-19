@@ -1,11 +1,14 @@
 import 'reflect-metadata';
 
 import Container from 'typedi';
-import config from './config';
+import dbConfig from './config/db.config';
+import serverConfig from './config/server.config';
 import Database from './db/database';
 import ExpressServer from './server';
 
-config();
+//config db and server
+dbConfig();
+serverConfig();
 
 const server = Container.get(ExpressServer);
 const database = Container.get(Database);

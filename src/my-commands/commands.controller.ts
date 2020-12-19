@@ -1,4 +1,4 @@
-import { Inject, Service } from 'typedi';
+import { Inject } from 'typedi';
 import CommandService from './commands.service';
 import { Request, Response, NextFunction } from 'express';
 import { validateOrReject } from 'class-validator';
@@ -7,7 +7,6 @@ import PlatformService from '../platforms/PlatformService';
 import CommandInputDto from './dto/command.input.dto';
 import CommandCreateDto from './dto/command.create.dto';
 
-@Service()
 class CommandController {
   @Inject()
   private commandService!: CommandService;

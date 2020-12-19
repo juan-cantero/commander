@@ -1,6 +1,6 @@
 import express from 'express';
 import commandsRoutes from '../my-commands/routes';
-import userRoutes from '../users/routes';
+import userRoutes from '../users/userRoutes';
 
 const routes = express.Router();
 

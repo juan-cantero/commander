@@ -1,5 +1,7 @@
 import { NextFunction, Response } from 'express';
+import { Service } from 'typedi';
 
+@Service()
 class ErrorHandler {
   static passErrorToHandler(error: Error, next: NextFunction): void {
     next(error);

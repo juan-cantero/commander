@@ -5,7 +5,6 @@ class ErrorNext extends Error {
   public statusCode!: number;
 }
 
-@Service()
 class ErrorHandlerMiddleware {
   handleNotFound(req: Request, res: Response, next: NextFunction): void {
     const error = new Error(`Route not found ${req.originalUrl}`);

@@ -1,13 +1,19 @@
 import express, { Request, Response, NextFunction } from 'express';
 import Container from 'typedi';
+import AuthMiddleWare from '../middlewares/AuthMiddleware';
 import CommandController from './commands.controller';
 
 const commandsRoutes: express.IRouter = express.Router();
 const commandController = Container.get(CommandController);
+const authMiddleware = Container.get(AuthMiddleWare);
 
-commandsRoutes.get('/', (req: Request, res: Response, next: NextFunction) => {
-  commandController.getAllCommands(req, res, next);
-});
+commandsRoutes.get(
+  '/',
+  authMiddleware.verifyToken,
+  (req: Request, res: Response, next: NextFunction) => {
+    commandController.getAllCommands(req, res, next);
+  }
+);
 
 commandsRoutes.get(
   '/search/description/:description',

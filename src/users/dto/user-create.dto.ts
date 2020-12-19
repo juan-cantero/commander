@@ -3,3 +3,5 @@ class UserCreateDto {
   email!: String;
   password!: String;
 }
+
+export default UserCreateDto;
