@@ -1,17 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import Container, { Inject, Service } from 'typedi';
+import { Inject, Service } from 'typedi';
 import ErrorHandler from '../services/ErrorHandler';
 import TokenService from '../services/token.service';
-import User, { IUser } from '../users/user.model';
+import { IUser } from '../users/user.model';
 import UserService from '../users/user.service';
-
-const tokenService = Container.get(TokenService);
-const userService = Container.get(UserService);
 
 @Service()
 class AuthMiddleWare {
-  //private userService = userService;
+  @Inject()
+  private readonly userService!: UserService;
+  @Inject()
+  private readonly tokenService!: TokenService;
 
   async verifyToken(req: Request, res: Response, next: NextFunction) {
     if (!req.headers.authorization) {
@@ -25,9 +25,11 @@ class AuthMiddleWare {
     if (tokenWasSendAndStartsWithBearer) {
       try {
         token = req.headers.authorization.split(' ')[1];
-        const decoded: any = jwt.verify(token, tokenService.secretToken);
+        const decoded: any = jwt.verify(token, this.tokenService.secretToken);
 
-        const user: IUser | null = await userService.findUserById(decoded.id);
+        const user: IUser | null = await this.userService.findUserById(
+          decoded.id
+        );
 
         if (user) {
           req.headers['userid'] = user._id;

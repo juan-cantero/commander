@@ -1,6 +1,7 @@
 import { Inject, Service } from 'typedi';
 import jwt from 'jsonwebtoken';
 import jwtConfig from '../config/jwt.config';
+//config jwt
 jwtConfig();
 
 @Service()

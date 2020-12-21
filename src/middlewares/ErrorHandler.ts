@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-import { Service } from 'typedi';
 
 class ErrorNext extends Error {
   public statusCode!: number;
