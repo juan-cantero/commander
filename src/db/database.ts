@@ -9,7 +9,9 @@ class Database implements IDatabase {
   @Inject('mongoUrl')
   private mongoUrl!: string;
 
-  constructor(private logger: Logger) {}
+  constructor(private logger: Logger, url?: string) {
+    if (url) this.mongoUrl = url;
+  }
 
   async connect(): Promise<void> {
     try {

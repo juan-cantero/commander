@@ -14,8 +14,11 @@ export class InMemoryDb implements IDatabase {
   async connect(): Promise<void> {
     try {
       const uri = await this.mongod.getUri();
+      const port = await this.mongod.getPort();
       mongoose.connect(uri, connectionOptions);
-      this.logger.connectionSuccessInTesting('[test]database connected');
+      this.logger.connectionSuccessInTesting(
+        `[test]database connected on port ${port}`
+      );
     } catch (error) {
       console.log(error);
       this.logger.errorInTesting(

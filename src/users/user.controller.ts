@@ -8,6 +8,7 @@ import TokenService from '../services/token.service';
 import { IUser } from './user.model';
 import UserAuthenticatedDto from './dto/user-authenticated.dto';
 import Encryption from '../services/Encryption';
+import ErrorWithStatus from '../types/errors/ErrorWithStatus';
 
 @Service()
 class UserController {
@@ -19,14 +20,18 @@ class UserController {
 
   //@describe auth user
   //@route POST /api/users/login
-  //@access PRIVATE
+  //@access PUBLIC
   async authUser(req: Request, res: Response, next: NextFunction) {
     const { email, password } = req.body;
-    try {
-      const dbUser: IUser | null = await this.userService.findUserByEmail(
-        email
-      );
+    let dbUser: IUser | null;
 
+    try {
+      dbUser = await this.userService.findUserByEmail(email);
+      if (!dbUser) {
+        const error = new ErrorWithStatus('invalid username or password');
+        error.statusCode = 401;
+        throw error;
+      }
       const passwordIsValid = await this.userService.checkForPasswordMatching(
         password,
         dbUser!.password as string
@@ -41,7 +46,9 @@ class UserController {
         );
         return res.status(200).json(authenticatedUser);
       } else {
-        throw new Error('invalid username or password');
+        const error = new ErrorWithStatus('invalid username or password');
+        error.statusCode = 401;
+        throw error;
       }
     } catch (error) {
       ErrorHandler.passErrorToHandler(error, next);
