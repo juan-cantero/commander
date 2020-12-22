@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es2018",
     "module": "commonjs",
     "outDir": "./build",
     "rootDir": "./src",
+    "lib": ["es2015", "es2016", "dom", "es2018.promise"],
 
     "strict": true,
     "esModuleInterop": true,

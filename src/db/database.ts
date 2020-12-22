@@ -1,20 +1,15 @@
-import mongoose, { ConnectOptions } from 'mongoose';
+import mongoose from 'mongoose';
 import { Inject, Service } from 'typedi';
 import Logger from '../services/Logger';
-
-const connectionOptions: ConnectOptions = {
-  useUnifiedTopology: true,
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
-};
+import { connectionOptions } from './config';
+import { IDatabase } from './IDatabase';
 
 @Service()
-class Database {
-  @Inject()
-  private logger!: Logger;
+class Database implements IDatabase {
   @Inject('mongoUrl')
   private mongoUrl!: string;
+
+  constructor(private logger: Logger) {}
 
   async connect(): Promise<void> {
     try {
@@ -26,7 +21,12 @@ class Database {
   }
 
   async closeConnection() {
-    await mongoose.disconnect();
+    try {
+      await mongoose.disconnect();
+      this.logger.connectionSuccess('database disconnected');
+    } catch (error) {
+      this.logger.error('something bad happened to the db connection');
+    }
   }
 }
 

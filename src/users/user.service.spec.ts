@@ -1,22 +1,19 @@
 import UserService from './user.service';
-import { MongoMemoryServer } from 'mongodb-memory-server';
 import User, { IUser } from './user.model';
-import mongoose from 'mongoose';
 import Container from 'typedi';
 import Encryption from '../services/Encryption';
+import { InMemoryDb } from '../db/InMemoryDb';
+import Logger from '../services/Logger';
 
 const encryption = Container.get(Encryption);
+const logger = Container.get(Logger);
 
 describe('user service test suite', () => {
   let userService: UserService = new UserService(encryption);
-  const mongod = new MongoMemoryServer();
+  const database: InMemoryDb = new InMemoryDb(logger);
 
   beforeAll(async () => {
-    const uri = await mongod.getUri();
-    await mongoose.connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await database.connect();
     User.collection.insertMany([
       { name: 'user1', email: 'user1@email.com', password: '123' },
       { name: 'user2', email: 'user2', password: '123' },
@@ -25,8 +22,7 @@ describe('user service test suite', () => {
 
   afterAll(async () => {
     await User.collection.drop();
-    await mongoose.disconnect();
-    await mongod.stop();
+    await database.closeConnection();
   });
 
   const createdUser = {
