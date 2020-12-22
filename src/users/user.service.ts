@@ -5,8 +5,7 @@ import User, { IUser } from './user.model';
 
 @Service()
 class UserService {
-  @Inject()
-  private encryption!: Encryption;
+  constructor(private readonly encryption: Encryption) {}
   async findUserById(id: string): Promise<IUser | null> {
     try {
       const foundedUser = await User.findById(id);
@@ -26,18 +25,24 @@ class UserService {
   }
 
   async checkForPasswordMatching(
-    dbUserPassword: string,
-    loginUserPassword: string
+    loginUserPassword: string,
+    dbUserPassword: string
   ): Promise<boolean> {
     return await this.encryption.passwordMatch(
-      dbUserPassword,
-      loginUserPassword
+      loginUserPassword,
+      dbUserPassword
     );
   }
 
   async createUser(userInfo: UserCreateDto): Promise<IUser> {
     try {
-      const user = new User(userInfo);
+      const { name, email, password } = userInfo;
+      const userInfoPrepared = {
+        name,
+        email,
+        password: await this.encryption.encryptPassword(password as string),
+      };
+      const user = new User(userInfoPrepared);
       const createdUser = await user.save();
       return createdUser;
     } catch (error) {

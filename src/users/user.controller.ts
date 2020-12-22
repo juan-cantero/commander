@@ -9,13 +9,13 @@ import { IUser } from './user.model';
 import UserAuthenticatedDto from './dto/user-authenticated.dto';
 import Encryption from '../services/Encryption';
 
+@Service()
 class UserController {
-  @Inject()
-  private userService!: UserService;
-  @Inject()
-  private tokenService!: TokenService;
-  @Inject()
-  private encryptionService!: Encryption;
+  constructor(
+    private readonly userService: UserService,
+    private readonly tokenService: TokenService,
+    private readonly encryptionService: Encryption
+  ) {}
 
   //@describe auth user
   //@route POST /api/users/login
@@ -39,7 +39,7 @@ class UserController {
           dbUser.email,
           token
         );
-        res.status(200).json(authenticatedUser);
+        return res.status(200).json(authenticatedUser);
       } else {
         throw new Error('invalid username or password');
       }
@@ -68,9 +68,7 @@ class UserController {
       userCreateDto = new UserCreateDto();
       userCreateDto.name = name;
       userCreateDto.email = email;
-      userCreateDto.password = await this.encryptionService.encryptPassword(
-        password
-      );
+      userCreateDto.password = password;
       await validateOrReject(userCreateDto);
     } catch (error) {
       return ErrorHandler.handleValidationError(error, res);

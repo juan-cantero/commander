@@ -22,6 +22,10 @@ class ExpressServer {
     this._app.listen(this._port, callback);
   }
 
+  get app() {
+    return this._app;
+  }
+
   get port(): number {
     return this._port;
   }

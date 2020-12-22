@@ -24,6 +24,10 @@ class Database {
       this.logger.error('something bad happened to the db connection');
     }
   }
+
+  async closeConnection() {
+    await mongoose.disconnect();
+  }
 }
 
 export default Database;
