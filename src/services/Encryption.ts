@@ -1,7 +1,7 @@
 import { Service } from 'typedi';
 import bcrypt from 'bcrypt';
 
-@Service({ global: true })
+@Service()
 class Encryption {
   async encryptPassword(plainPassword: string): Promise<string> {
     try {

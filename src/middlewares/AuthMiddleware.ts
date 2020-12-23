@@ -1,19 +1,21 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { Inject, Service } from 'typedi';
+
+import Container, { Inject, Service } from 'typedi';
 import ErrorHandler from '../services/ErrorHandler';
 import TokenService from '../services/token.service';
+import ErrorWithStatus from '../types/errors/ErrorWithStatus';
 import { IUser } from '../users/user.model';
 import UserService from '../users/user.service';
-
+import ErrorHandlerMiddleware from './ErrorHandler';
 @Service()
 class AuthMiddleWare {
-  @Inject()
-  private readonly userService!: UserService;
-  @Inject()
-  private readonly tokenService!: TokenService;
+  constructor(
+    private readonly userService: UserService,
+    private readonly tokenService: TokenService
+  ) {}
 
-  async verifyToken(req: Request, res: Response, next: NextFunction) {
+  verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     if (!req.headers.authorization) {
       return res.status(401).json({ error: 'not token' });
     }
@@ -40,7 +42,22 @@ class AuthMiddleWare {
         ErrorHandler.passErrorToHandler(error, next);
       }
     }
-  }
+  };
+
+  isAdmin = async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.headers['userid'] as string;
+    try {
+      const user = await this.userService.findUserById(userId);
+      if (!user?.isAdmin) {
+        const error = new ErrorWithStatus('you do not have admin rights');
+        error.statusCode = 401;
+        throw error;
+      }
+      next();
+    } catch (error) {
+      ErrorHandler.passErrorToHandler(error, next);
+    }
+  };
 }
 
 export default AuthMiddleWare;

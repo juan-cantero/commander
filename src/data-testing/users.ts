@@ -5,6 +5,7 @@ export const usersData = [
     name: 'user1',
     email: 'user1@email.com',
     password: bcrypt.hashSync('123456', 10),
+    isAdmin: true,
   },
   {
     name: 'user2',

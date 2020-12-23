@@ -1,21 +1,19 @@
 import { Inject, Service } from 'typedi';
 import UserService from './user.service';
 import { Request, Response, NextFunction } from 'express';
-import { validateOrReject } from 'class-validator';
+import { validate, validateOrReject } from 'class-validator';
 import ErrorHandler from '../services/ErrorHandler';
 import UserCreateDto from './dto/user-create.dto';
 import TokenService from '../services/token.service';
 import { IUser } from './user.model';
 import UserAuthenticatedDto from './dto/user-authenticated.dto';
-import Encryption from '../services/Encryption';
 import ErrorWithStatus from '../types/errors/ErrorWithStatus';
 
 @Service()
 class UserController {
   constructor(
     private readonly userService: UserService,
-    private readonly tokenService: TokenService,
-    private readonly encryptionService: Encryption
+    private readonly tokenService: TokenService
   ) {}
 
   //@describe auth user
@@ -76,7 +74,11 @@ class UserController {
       userCreateDto.name = name;
       userCreateDto.email = email;
       userCreateDto.password = password;
-      await validateOrReject(userCreateDto);
+      const validationErrors = await validate(userCreateDto);
+      if (validationErrors.length > 0) {
+        const errors = validationErrors.map(error => error.constraints);
+        res.status(400).json(errors);
+      }
     } catch (error) {
       return ErrorHandler.handleValidationError(error, res);
     }

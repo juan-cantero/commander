@@ -21,6 +21,7 @@ export class UserSeeder {
 
   async populateDatabase(): Promise<void> {
     try {
+      await this.destroyData();
       await User.insertMany(usersData);
       logger.info('database poupulated');
       process.exit();
@@ -34,7 +35,6 @@ export class UserSeeder {
     try {
       await User.deleteMany({});
       logger.info('data destroyed');
-      process.exit();
     } catch (error) {
       logger.error('could not destroy data');
       process.exit();

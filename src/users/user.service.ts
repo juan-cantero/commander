@@ -3,7 +3,7 @@ import Encryption from '../services/Encryption';
 import UserCreateDto from './dto/user-create.dto';
 import User, { IUser } from './user.model';
 
-@Service()
+@Service({ global: true })
 class UserService {
   constructor(private readonly encryption: Encryption) {}
   async findUserById(id: string): Promise<IUser | null> {
