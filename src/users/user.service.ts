@@ -3,7 +3,7 @@ import Encryption from '../services/Encryption';
 import UserCreateDto from './dto/user-create.dto';
 import User, { IUser } from './user.model';
 
-@Service({ global: true })
+@Service()
 class UserService {
   constructor(private readonly encryption: Encryption) {}
   async findUserById(id: string): Promise<IUser | null> {
@@ -45,6 +45,15 @@ class UserService {
       const user = new User(userInfoPrepared);
       const createdUser = await user.save();
       return createdUser;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteUserById(id: string) {
+    try {
+      const deletedUser = await User.findByIdAndDelete(id);
+      return deletedUser;
     } catch (error) {
       throw error;
     }

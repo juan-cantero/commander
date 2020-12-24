@@ -20,4 +20,12 @@ userRoutes.post('/login', (req: Request, res: Response, next: NextFunction) => {
   userController.authUser(req, res, next);
 });
 
+userRoutes.delete(
+  '/:id',
+  authMiddleware.verifyToken,
+  (req: Request, res: Response, next: NextFunction) => {
+    userController.deleteUserById(req, res, next);
+  }
+);
+
 export default userRoutes;

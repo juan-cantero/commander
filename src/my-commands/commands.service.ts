@@ -22,6 +22,15 @@ class CommandService {
     }
   }
 
+  async getCommandsByUserId(userId: string): Promise<CommandOutputDto[]> {
+    try {
+      const commands = await Command.find({ user: userId });
+      return commands;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async getCommandsByDescription(
     description: string,
     platform?: string

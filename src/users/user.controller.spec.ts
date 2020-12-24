@@ -1,7 +1,6 @@
 import UserApiCalls from '../api/UserApiCalls';
 import { UserCredentials } from './types/UserCredentials';
 import { v4 as uuidv4 } from 'uuid';
-import UserService from './user.service';
 
 //#########IMPORTANT########
 // this test uses the testing database, you can see users in data-testing folder
@@ -76,5 +75,16 @@ describe('user controller test suite', () => {
         },
       ]);
     }
+  });
+
+  it('should delete the owner user', async () => {
+    const { data } = await UserApiCalls.login(regularUser);
+    const token = data.token;
+    const userIdForDeletion = data._id;
+    const response = await UserApiCalls.deleteUserById(
+      userIdForDeletion,
+      token
+    );
+    expect(response.status).toBe(200);
   });
 });

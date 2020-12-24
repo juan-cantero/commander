@@ -27,6 +27,16 @@ class UserApiCalls {
       },
     });
   }
+
+  static async deleteUserById(id: string, token: string) {
+    const formatedToken = token.trim();
+    return await userApiCall.delete(`/${id}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${formatedToken}`,
+      },
+    });
+  }
 }
 
 export default UserApiCalls;

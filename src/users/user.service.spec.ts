@@ -57,4 +57,10 @@ describe('user service test suite', () => {
 
     expect(passwordMatch).toBe(true);
   });
+
+  it('should delete a user', async () => {
+    const user = await userService.findUserByEmail('user1@email.com');
+    const deletedUser = await userService.deleteUserById(user?._id);
+    expect(deletedUser?.email).toBe(user?.email);
+  });
 });

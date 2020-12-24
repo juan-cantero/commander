@@ -19,6 +19,14 @@ export class UserSeeder {
     }
   }
 
+  async disconnect() {
+    try {
+      await this.db.closeConnection();
+    } catch (error) {
+      logger.error(error);
+    }
+  }
+
   async populateDatabase(): Promise<void> {
     try {
       await this.destroyData();

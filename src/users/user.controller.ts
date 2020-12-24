@@ -1,4 +1,4 @@
-import { Inject, Service } from 'typedi';
+import { Service } from 'typedi';
 import UserService from './user.service';
 import { Request, Response, NextFunction } from 'express';
 import { validate, validateOrReject } from 'class-validator';
@@ -8,6 +8,7 @@ import TokenService from '../services/token.service';
 import { IUser } from './user.model';
 import UserAuthenticatedDto from './dto/user-authenticated.dto';
 import ErrorWithStatus from '../types/errors/ErrorWithStatus';
+import { UserDeletedDto } from './dto/user-deleted.dto';
 
 @Service()
 class UserController {
@@ -86,6 +87,37 @@ class UserController {
     try {
       const createdUser = await this.userService.createUser(userCreateDto);
       res.status(200).json({ ok: true, createdUser });
+    } catch (error) {
+      ErrorHandler.passErrorToHandler(error, next);
+    }
+  }
+
+  //@describe delete user
+  //@route DELETE /api/users
+  //@access PRIVATE
+  async deleteUserById(req: Request, res: Response, next: NextFunction) {
+    const userIdForDeletion = req.params.id;
+    const ownerUserId = req.headers['userid'] as string;
+
+    try {
+      if (userIdForDeletion.localeCompare(ownerUserId) !== 0) {
+        const error = new ErrorWithStatus(
+          'You need to be the owner of the account to delete it'
+        );
+        error.statusCode = 401;
+        throw error;
+      }
+      const deletedUser = await this.userService.deleteUserById(
+        userIdForDeletion
+      );
+      if (!deletedUser) {
+        const error = new ErrorWithStatus('could not delete the user');
+        error.statusCode = 409;
+        throw error;
+      }
+      const { _id, name, email } = deletedUser;
+      const userDeletedDto = new UserDeletedDto(_id, name, email);
+      res.status(200).json(userDeletedDto);
     } catch (error) {
       ErrorHandler.passErrorToHandler(error, next);
     }
