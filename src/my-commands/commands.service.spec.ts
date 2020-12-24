@@ -1,48 +1,76 @@
 import mongoose from 'mongoose';
 import Container from 'typedi';
 import { InMemoryDb } from '../db/InMemoryDb';
-import Encryption from '../services/Encryption';
+import PlatformService from '../platforms/PlatformService';
 import Logger from '../services/Logger';
-import UserService from '../users/user.service';
 import Command from './commands.model';
 import CommandService from './commands.service';
+import CommandCreateDto from './dto/command.create.dto';
 
-const encryption = Container.get(Encryption);
 const logger = Container.get(Logger);
 
-describe('user service test suite', () => {
+describe('command service test suite', () => {
   let commandService = new CommandService();
+  let platformService = new PlatformService();
   const database: InMemoryDb = new InMemoryDb(logger);
 
   beforeAll(async () => {
     await database.connect();
-    Command.collection.insertMany([
+  });
+
+  beforeEach(async () => {
+    await Command.collection.insertMany([
       {
         user: mongoose.Types.ObjectId('5fe4b47ca656c4b3f2b35b9b'),
         description: 'list files',
         command: 'ls',
-        platform: 'linux',
+        platform: mongoose.Types.ObjectId(),
       },
       {
         user: mongoose.Types.ObjectId('5fe4b47ca656c4b3f2b35b9b'),
         description: 'network statistics',
         command: 'netstat',
-        platform: 'linux',
+        platform: mongoose.Types.ObjectId(),
       },
       {
         user: mongoose.Types.ObjectId(),
         description: 'list directories',
         command: 'dir',
-        platform: 'windows',
+        platform: mongoose.Types.ObjectId('5fe4baf52922d96a163286fe'),
       },
     ]);
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await Command.collection.drop();
+  });
+
+  afterAll(async () => {
     await database.closeConnection();
   });
 
+  it('should create a command', async () => {
+    const input = {
+      user: '5fe4b47ca656c4b3f2b35b9b',
+      command: 'npm install',
+      description: 'install package',
+      platform: 'node',
+    };
+    const dbPlatform = await platformService.findOrCreatePlatform(
+      input.platform
+    );
+    const commandData = new CommandCreateDto();
+    commandData.user = input.user;
+    commandData.command = input.command;
+    commandData.description = input.description;
+    commandData.platform = dbPlatform._id;
+    const command = await commandService.createCommand(commandData);
+    expect(command.command).toBe('npm install');
+  });
+  it('should get all the commands', async () => {
+    const commands = await commandService.getAllCommands();
+    expect(commands.length).toBe(3);
+  });
   it('should get all the commands for a user', async () => {
     const commands = await commandService.getCommandsByUserId(
       '5fe4b47ca656c4b3f2b35b9b'

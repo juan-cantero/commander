@@ -9,6 +9,7 @@
     "start:prod": "export NODE_ENV=production && nodemon",
     "start:dev": "export NODE_ENV=development && nodemon",
     "start:testing": "export NODE_ENV=testing && nodemon",
+    "data:populate:dev": "export NODE_ENV=development && ts-node src/data-testing/UserSeeder.ts",
     "data:populate": "export NODE_ENV=testing && ts-node src/data-testing/UserSeeder.ts",
     "data:destroy": "export NODE_ENV=testing && ts-node src/data-testing/UserSeeder.ts -d",
     "build": "tsc -p tsconfig-build.json",

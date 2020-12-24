@@ -25,6 +25,19 @@ class CommandController {
     }
   }
 
+  //@describe get commands by user
+  //@route GET /api/commands/user/:userId
+  //@access PRIVATE
+  async getCommandsByUser(req: Request, res: Response, next: NextFunction) {
+    const userId = req.params.userId;
+    try {
+      const commands = await this.commandService.getCommandsByUserId(userId);
+      res.status(200).json(commands);
+    } catch (error) {
+      ErrorHandler.passErrorToHandler(error, next);
+    }
+  }
+
   //@describe get all the commands that match description
   //@route GET /api/commands/search/description/:description?platfrom
   //@access PRIVATE
@@ -99,9 +112,10 @@ class CommandController {
   //@route Delete /api/commands/:commandId
   //@access PRIVATE
   async deleteCommand(req: Request, res: Response, next: NextFunction) {
+    const userId = req.headers['userid'] as string;
     const { commandId } = req.params;
     try {
-      await this.commandService.deleteCommand(commandId);
+      await this.commandService.deleteCommand(commandId, userId);
       res.status(200).json({ ok: true, message: 'command deleted' });
     } catch (error) {
       ErrorHandler.passErrorToHandler(error, next);

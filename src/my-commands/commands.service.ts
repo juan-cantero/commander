@@ -4,6 +4,8 @@ import CommandCreateDto from './dto/command.create.dto';
 import { RegexQuery } from './command.types';
 import CommandOutputDto from './dto/command.output.dto';
 import PlatformService from '../platforms/PlatformService';
+import commandsRoutes from './routes';
+import ErrorWithStatus from '../types/errors/ErrorWithStatus';
 
 @Service()
 class CommandService {
@@ -84,9 +86,18 @@ class CommandService {
     }
   }
 
-  async deleteCommand(commandId: string) {
+  async deleteCommand(commandId: string, loggedUserId: string) {
     try {
-      await Command.findByIdAndDelete(commandId);
+      const command = await Command.findById(commandId);
+      const ownerId = command?.user.toString();
+      if (ownerId && ownerId.localeCompare(loggedUserId) !== 0) {
+        const error = new ErrorWithStatus(
+          'can not delete, you are not the owner'
+        );
+        error.statusCode = 401;
+        throw error;
+      }
+      await command?.save();
     } catch (error) {
       throw error;
     }

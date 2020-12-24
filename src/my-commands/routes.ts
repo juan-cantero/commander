@@ -17,7 +17,16 @@ commandsRoutes.get(
 );
 
 commandsRoutes.get(
+  '/user/:userId',
+  authMiddleware.verifyToken,
+  (req: Request, res: Response, next: NextFunction) => {
+    commandController.getCommandsByUser(req, res, next);
+  }
+);
+
+commandsRoutes.get(
   '/search/description/:description',
+  authMiddleware.verifyToken,
   (req: Request, res: Response, next: NextFunction) => {
     commandController.getCommandsByDescription(req, res, next);
   }
@@ -25,6 +34,7 @@ commandsRoutes.get(
 
 commandsRoutes.get(
   '/search/platform/:platform',
+  authMiddleware.verifyToken,
   (req: Request, res: Response, next: NextFunction) => {
     commandController.getCommandsByPlatform(req, res, next);
   }
@@ -36,6 +46,7 @@ commandsRoutes.post('/', (req: Request, res: Response, next: NextFunction) => {
 
 commandsRoutes.delete(
   '/:commandId',
+  authMiddleware.verifyToken,
   (req: Request, res: Response, next: NextFunction) => {
     commandController.deleteCommand(req, res, next);
   }
