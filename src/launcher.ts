@@ -2,6 +2,7 @@ import { Inject, Service } from 'typedi';
 import dbConfig from './config/db.config';
 import serverConfig from './config/server.config';
 import Database from './db/database';
+import { InMemoryDb } from './db/InMemoryDb';
 import ExpressServer from './server';
 
 //config db and server

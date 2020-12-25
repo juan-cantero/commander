@@ -8,28 +8,28 @@ import { usersData } from './users';
 dbConfig();
 const logger = Container.get(Logger);
 const mongoUrl = Container.get('mongoUrl') as string;
+const db = new Database(logger, mongoUrl);
 export class UserSeeder {
-  private db = new Database(logger, mongoUrl);
-  async connectToDatabase(): Promise<void> {
+  static async connectToDatabase(): Promise<void> {
     try {
-      await this.db.connect();
+      await db.connect();
     } catch (error) {
       logger.error(error);
       process.exit();
     }
   }
 
-  async disconnect() {
+  static async disconnect() {
     try {
-      await this.db.closeConnection();
+      await db.closeConnection();
     } catch (error) {
       logger.error(error);
     }
   }
 
-  async populateDatabase(): Promise<void> {
+  static async populateDatabase(): Promise<void> {
     try {
-      await this.destroyData();
+      await UserSeeder.destroyData();
       await User.insertMany(usersData);
       logger.info('database poupulated');
       process.exit();
@@ -39,7 +39,7 @@ export class UserSeeder {
     }
   }
 
-  async destroyData(): Promise<void> {
+  static async destroyData(): Promise<void> {
     try {
       await User.deleteMany({});
       logger.info('data destroyed');
@@ -56,12 +56,10 @@ export class UserSeeder {
   }
 }
 
-const userSeeder = new UserSeeder();
-
-userSeeder.connectToDatabase();
+UserSeeder.connectToDatabase();
 
 if (process.argv[2] === '-d') {
-  userSeeder.destroyData();
+  UserSeeder.destroyData();
 } else {
-  userSeeder.populateDatabase();
+  UserSeeder.populateDatabase();
 }

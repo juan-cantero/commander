@@ -18,6 +18,7 @@ class UserService {
   async findUserByEmail(email: string): Promise<IUser | null> {
     try {
       const user = await User.findOne({ email });
+      if (!user) return null;
       return user;
     } catch (error) {
       throw error;

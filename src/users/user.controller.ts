@@ -67,7 +67,7 @@ class UserController {
         throw new Error('There is already an user with that mail');
       }
     } catch (error) {
-      ErrorHandler.passErrorToHandler(error, next);
+      return ErrorHandler.passErrorToHandler(error, next);
     }
 
     try {
@@ -78,7 +78,7 @@ class UserController {
       const validationErrors = await validate(userCreateDto);
       if (validationErrors.length > 0) {
         const errors = validationErrors.map(error => error.constraints);
-        res.status(400).json(errors);
+        return res.status(400).json(errors);
       }
     } catch (error) {
       return ErrorHandler.handleValidationError(error, res);

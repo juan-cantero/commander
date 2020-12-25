@@ -1,6 +1,11 @@
 import UserApiCalls from '../api/UserApiCalls';
 import { UserCredentials } from './types/UserCredentials';
 import { v4 as uuidv4 } from 'uuid';
+import UserService from './user.service';
+import Container from 'typedi';
+import Encryption from '../services/Encryption';
+const encryption = Container.get(Encryption);
+const userService = new UserService(encryption);
 
 //#########IMPORTANT########
 // this test uses the testing database, you can see users in data-testing folder
@@ -23,7 +28,6 @@ describe('user controller test suite', () => {
 
   it('should login ', async () => {
     const response = await UserApiCalls.login(regularUser);
-
     expect(response.status).toBe(200);
     expect(response.data.email).toBe(regularUser.email);
   });
