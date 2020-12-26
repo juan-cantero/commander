@@ -1,11 +1,12 @@
 import { Inject } from 'typedi';
 import CommandService from './commands.service';
 import { Request, Response, NextFunction } from 'express';
-import { validateOrReject } from 'class-validator';
+import { validate, validateOrReject } from 'class-validator';
 import ErrorHandler from '../services/ErrorHandler';
 import PlatformService from '../platforms/PlatformService';
 import CommandInputDto from './dto/command.input.dto';
 import CommandCreateDto from './dto/command.create.dto';
+import { CommandSearchDto } from './dto/command.search.dto';
 
 class CommandController {
   @Inject()
@@ -46,14 +47,13 @@ class CommandController {
     res: Response,
     next: NextFunction
   ) {
+    const userId = req.headers['userid'] as string;
     try {
-      const description = req.params.description;
+      const description = req.query.description as string;
       const platform: string = req.query.platform as string;
-      const commands = await this.commandService.getCommandsByDescription(
-        description,
-        platform
-      );
-      res.status(200).json({ ok: true, commands });
+      const search = new CommandSearchDto(description, platform);
+      const commands = await this.commandService.searchCommands(userId, search);
+      res.status(200).json(commands);
     } catch (error) {
       ErrorHandler.passErrorToHandler(error, next);
     }
@@ -84,7 +84,11 @@ class CommandController {
     commandInput.platform = platform;
 
     try {
-      await validateOrReject(commandInput);
+      const validationErrors = await validate(commandInput);
+      if (validationErrors.length > 0) {
+        const errors = validationErrors.map(error => error.constraints);
+        return res.status(400).json(errors);
+      }
     } catch (error) {
       return ErrorHandler.handleValidationError(error, res);
     }

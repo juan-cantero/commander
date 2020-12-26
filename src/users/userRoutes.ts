@@ -9,8 +9,8 @@ const authMiddleware = Container.get(AuthMiddleWare);
 
 userRoutes.post(
   '/',
-  //authMiddleware.verifyToken,
-  //authMiddleware.isAdmin,
+  authMiddleware.verifyToken,
+  authMiddleware.isAdmin,
   (req: Request, res: Response, next: NextFunction) => {
     userController.createUser(req, res, next);
   }

@@ -4,7 +4,7 @@ class CommandInputDto {
   @IsMongoId()
   user!: string;
   @IsString()
-  @IsNotEmpty({ message: 'no tiene que estar vacio' })
+  @IsNotEmpty()
   command!: string;
   @IsString()
   @IsNotEmpty()

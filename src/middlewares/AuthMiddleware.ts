@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
 import Container, { Inject, Service } from 'typedi';
+import Command from '../my-commands/commands.model';
 import ErrorHandler from '../services/ErrorHandler';
 import TokenService from '../services/token.service';
 import ErrorWithStatus from '../types/errors/ErrorWithStatus';

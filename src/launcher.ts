@@ -3,7 +3,7 @@ import dbConfig from './config/db.config';
 import serverConfig from './config/server.config';
 import Database from './db/database';
 import { InMemoryDb } from './db/InMemoryDb';
-import ExpressServer from './server';
+import ExpressServer from './ExpressServer';
 
 //config db and server
 dbConfig();
@@ -16,8 +16,8 @@ class Launcher {
   @Inject()
   private database!: Database;
 
-  start() {
-    this.database.connect();
+  async start() {
+    await this.database.connect();
 
     this.server.start(() => {
       this.server.logger.info(`server start on port ${this.server.port}`);

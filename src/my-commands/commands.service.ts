@@ -6,6 +6,7 @@ import CommandOutputDto from './dto/command.output.dto';
 import PlatformService from '../platforms/PlatformService';
 import commandsRoutes from './routes';
 import ErrorWithStatus from '../types/errors/ErrorWithStatus';
+import { CommandSearchDto } from './dto/command.search.dto';
 
 @Service()
 class CommandService {
@@ -26,35 +27,41 @@ class CommandService {
 
   async getCommandsByUserId(userId: string): Promise<CommandOutputDto[]> {
     try {
-      const commands = await Command.find({ user: userId });
+      const commands = await Command.find({ user: userId }).populate(
+        'platform',
+        'platform -_id'
+      );
+
       return commands;
     } catch (error) {
       throw error;
     }
   }
 
-  async getCommandsByDescription(
-    description: string,
-    platform?: string
+  async searchCommands(
+    userId: string,
+    search: CommandSearchDto
   ): Promise<ICommand[] | null> {
     let query: RegexQuery = {
-      description: { $regex: description, $options: 'i' },
+      description: { $regex: search.description, $options: 'i' },
     };
     let commands;
 
     try {
-      if (platform) {
+      if (search.platform) {
         const platformDb = await this._platformService.findPlatformByName(
-          platform
+          search.platform
         );
         commands = await Command.find({ ...query })
-          .and([{ platform: platformDb?._id }])
+          .and([{ user: userId }, { platform: platformDb?._id }])
           .populate({ path: 'platform', select: 'platform -_id' });
       } else {
-        commands = await Command.find({ ...query }).populate({
-          path: 'platform',
-          select: 'platform -_id',
-        });
+        commands = await Command.find({ ...query })
+          .and([{ user: userId }])
+          .populate({
+            path: 'platform',
+            select: 'platform -_id',
+          });
       }
 
       return commands;

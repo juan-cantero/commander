@@ -25,7 +25,7 @@ commandsRoutes.get(
 );
 
 commandsRoutes.get(
-  '/search/description/:description',
+  '/search',
   authMiddleware.verifyToken,
   (req: Request, res: Response, next: NextFunction) => {
     commandController.getCommandsByDescription(req, res, next);
@@ -40,9 +40,13 @@ commandsRoutes.get(
   }
 );
 
-commandsRoutes.post('/', (req: Request, res: Response, next: NextFunction) => {
-  commandController.createCommand(req, res, next);
-});
+commandsRoutes.post(
+  '/',
+  authMiddleware.verifyToken,
+  (req: Request, res: Response, next: NextFunction) => {
+    commandController.createCommand(req, res, next);
+  }
+);
 
 commandsRoutes.delete(
   '/:commandId',
