@@ -6,6 +6,10 @@ export declare interface ICommand extends Document {
   command: String;
   description: String;
   platform: mongoose.Schema.Types.ObjectId | string;
+  isThereDocumentWithThatNameAndPlatform(
+    category: string,
+    platform: string
+  ): boolean;
 }
 
 const CommandSchema = new mongoose.Schema(
@@ -33,12 +37,8 @@ const CommandSchema = new mongoose.Schema(
   },
   { timestamps: true, toJSON: { virtuals: true } }
 );
-
-CommandSchema.virtual('platformNames', {
-  ref: 'Platform',
-  localField: 'platform',
-  foreignField: 'platform',
-});
+CommandSchema.index({ user: 1 });
+CommandSchema.index({ command: 1, platform: 1 });
 
 CommandSchema.plugin(uniqueValidator);
 

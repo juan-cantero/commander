@@ -1,7 +1,6 @@
 import { IsMongoId, IsNotEmpty, IsString } from 'class-validator';
 
 class CommandInputDto {
-  @IsMongoId()
   user!: string;
   @IsString()
   @IsNotEmpty()

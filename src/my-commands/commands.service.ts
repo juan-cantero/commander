@@ -4,7 +4,6 @@ import CommandCreateDto from './dto/command.create.dto';
 import { RegexQuery } from './command.types';
 import CommandOutputDto from './dto/command.output.dto';
 import PlatformService from '../platforms/PlatformService';
-import commandsRoutes from './routes';
 import ErrorWithStatus from '../types/errors/ErrorWithStatus';
 import { CommandSearchDto } from './dto/command.search.dto';
 
@@ -84,6 +83,42 @@ class CommandService {
     }
   }
 
+  async findCommandByUserNameAndPlatform(
+    user: string,
+    name: string,
+    platform: string
+  ) {
+    try {
+      const command = await Command.findOne({
+        user: user,
+        command: name,
+        platform: platform,
+      });
+      return command;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async isThereCommandWithThatNameAndPlatform(
+    userId: string,
+    name: string,
+    platform: string
+  ) {
+    try {
+      const command = await this.findCommandByUserNameAndPlatform(
+        userId,
+        name,
+        platform
+      );
+      const doc = await Command.findOne({ _id: command?._id });
+      if (doc) return true;
+      else return false;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async createCommand(commandData: CommandCreateDto): Promise<ICommand> {
     const newCommand = new Command(commandData);
     try {
@@ -104,7 +139,7 @@ class CommandService {
         error.statusCode = 401;
         throw error;
       }
-      await command?.save();
+      await command?.deleteOne();
     } catch (error) {
       throw error;
     }

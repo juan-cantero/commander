@@ -48,6 +48,13 @@ commandsRoutes.post(
   }
 );
 
+commandsRoutes.get(
+  '/:command/:platform',
+  authMiddleware.verifyToken,
+  (req: Request, res: Response, next: NextFunction) => {
+    commandController.getCommandIdByNameAndPlatform(req, res, next);
+  }
+);
 commandsRoutes.delete(
   '/:commandId',
   authMiddleware.verifyToken,

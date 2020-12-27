@@ -7,6 +7,8 @@ import PlatformService from '../platforms/PlatformService';
 import CommandInputDto from './dto/command.input.dto';
 import CommandCreateDto from './dto/command.create.dto';
 import { CommandSearchDto } from './dto/command.search.dto';
+import ErrorWithStatus from '../types/errors/ErrorWithStatus';
+import ErrorHandlerMiddleware from '../middlewares/ErrorHandler';
 
 class CommandController {
   @Inject()
@@ -76,7 +78,8 @@ class CommandController {
   //@route POST /api/commands
   //@access PRIVATE
   async createCommand(req: Request, res: Response, next: NextFunction) {
-    const { user, command, description, platform } = req.body;
+    const user = req.headers['userid'] as string;
+    const { command, description, platform } = req.body;
     const commandInput = new CommandInputDto();
     commandInput.user = user;
     commandInput.command = command;
@@ -103,6 +106,19 @@ class CommandController {
       commandData.description = commandInput.description;
       commandData.platform = dbPlatform._id;
 
+      const isThereCommandWithThatNameAndPlatform = await this.commandService.isThereCommandWithThatNameAndPlatform(
+        commandData.user,
+        commandData.command,
+        commandData.platform
+      );
+      if (isThereCommandWithThatNameAndPlatform) {
+        const error = new ErrorWithStatus(
+          'there is already a command with that name'
+        );
+        error.statusCode = 409;
+        throw error;
+      }
+
       const createdCommand = await this.commandService.createCommand(
         commandData
       );
@@ -112,7 +128,7 @@ class CommandController {
     }
   }
 
-  //@describe create command
+  //@describe delete command
   //@route Delete /api/commands/:commandId
   //@access PRIVATE
   async deleteCommand(req: Request, res: Response, next: NextFunction) {
@@ -121,6 +137,36 @@ class CommandController {
     try {
       await this.commandService.deleteCommand(commandId, userId);
       res.status(200).json({ ok: true, message: 'command deleted' });
+    } catch (error) {
+      ErrorHandler.passErrorToHandler(error, next);
+    }
+  }
+
+  async getCommandIdByNameAndPlatform(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const userId = req.headers['userid'] as string;
+    const { command, platform } = req.params;
+    try {
+      const dbPlatform = await this.platformService.findOrCreatePlatform(
+        platform
+      );
+      const commandDb = await this.commandService.findCommandByUserNameAndPlatform(
+        userId,
+        command,
+        dbPlatform._id
+      );
+      if (!commandDb) {
+        const error = new ErrorWithStatus(
+          'There is not a command with that name or platform'
+        );
+        error.statusCode = 404;
+        throw error;
+      }
+
+      res.status(200).json(commandDb._id);
     } catch (error) {
       ErrorHandler.passErrorToHandler(error, next);
     }
